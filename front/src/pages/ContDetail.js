@@ -6,6 +6,7 @@ import { Card, Box, Button, Chip } from "@mui/material";
 import "../styles/index.css";
 // import "../styles/index.styl";
 import walletConnect from "../components/WalletConnect";
+import addWallet from "../components/AddWallet";
 import checkIfWalletIsConnected from "../components/CheckIfWalletIsConnected";
 import {
   fetchBranches,
@@ -19,6 +20,9 @@ function ContDetail() {
   const [relatedCommits, setRelatedCommits] = useState([]);
   const [commits, setCommits] = useState([]);
   const [tmpCommits, setTmpCommits] = useState([]);
+
+  // アドレス
+  const [addressValue, setAddressValue] = useState("");
 
   useEffect(() => {
     const getBranches = async () => {
@@ -35,6 +39,10 @@ function ContDetail() {
     };
 
     getBranches();
+
+    checkIfWalletIsConnected().then(function (value) {
+      setCurrentAccount(value);
+    })
 
     if (window.ethereum) {
       window.ethereum.on("chainChanged", (_chainId) =>
@@ -79,6 +87,25 @@ function ContDetail() {
         <button className="waveBtn" onClick={walletConnect}>
           Connect Wallet
         </button>
+        <br />
+        <textarea
+          name="messageArea"
+          className="form"
+          placeholder="成果物のリンクを添付"
+          type="text"
+          id="riward"
+          value={addressValue}
+          onChange={(e) => setAddressValue(e.target.value)}
+        />
+        <br />
+        <button
+          className="submitButton"
+          onClick={() => {
+            addWallet(currentAccount);
+          }}
+        >
+          タスクを作成する
+        </button>
       </Box>
       <div
         className="row"
@@ -91,7 +118,7 @@ function ContDetail() {
       >
         {branchesAndCommits}
       </div>
-    </div>
+    </div >
   );
 }
 

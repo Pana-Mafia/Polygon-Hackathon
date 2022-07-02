@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 const connectWallet = async () => {
     const { ethereum } = window;
     // setMineStatus("connecting");
+    var address = ""
 
     if (!ethereum) {
         alert(
@@ -17,6 +18,7 @@ const connectWallet = async () => {
                 method: "eth_requestAccounts",
             });
             console.log("Found an account! Address: ", accounts[0]);
+            address = accounts[0];
             // setMetamaskError(null);
             // setCurrentAccount(accounts[0]);
             // setMineStatus("ok");
@@ -31,6 +33,7 @@ const connectWallet = async () => {
         console.log(err);
         // setMineStatus("e");
     }
+    return ({ address });
 };
 
 export default connectWallet;

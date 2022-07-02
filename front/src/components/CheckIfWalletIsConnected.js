@@ -19,7 +19,7 @@ const checkIfWalletIsConnected = async () => {
     } else {
         console.log("No authorized account found");
     }
-    return ({ account })
+    return (account)
 };
 
 export default checkIfWalletIsConnected;
