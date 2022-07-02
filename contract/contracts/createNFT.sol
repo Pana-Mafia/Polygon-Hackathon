@@ -41,6 +41,23 @@ contract CreateNFT is ERC721URIStorage {
         return images[rand];
     }
 
+    function toAsciiString(address x) internal pure returns (string memory) {
+        bytes memory s = new bytes(40);
+        for (uint256 i = 0; i < 20; i++) {
+            bytes1 b = bytes1(uint8(uint256(uint160(x)) / (2**(8 * (19 - i)))));
+            bytes1 hi = bytes1(uint8(b) / 16);
+            bytes1 lo = bytes1(uint8(b) - 16 * uint8(hi));
+            s[2 * i] = char(hi);
+            s[2 * i + 1] = char(lo);
+        }
+        return string(s);
+    }
+
+    function char(bytes1 b) internal pure returns (bytes1 c) {
+        if (uint8(b) < 10) return bytes1(uint8(b) + 0x30);
+        else return bytes1(uint8(b) + 0x57);
+    }
+
     function writeNFT(
         string memory _build,
         string memory _contribute,
@@ -48,6 +65,25 @@ contract CreateNFT is ERC721URIStorage {
     ) public {
         uint256 newItemId = _tokenIds.current();
         console.log(_build);
+
+        // 文字列
+        string memory combinedWord = string(
+            abi.encodePacked(
+                "In this project ",
+                toAsciiString(_owner),
+                " contributed to ",
+                _build,
+                "% "
+            )
+            // abi.encodePacked("testing our NFT service")
+        );
+        // 背景
+        string
+            memory baseSvg = "<svg xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='xMinYMin meet' viewBox='0 0 350 350'><style>.base { fill: white; font-family: serif; font-size: 8px; }</style><rect width='100%' height='100%' fill='black' /><text x='50%' y='50%' class='base' dominant-baseline='middle' text-anchor='middle'>";
+        // 最終のデータ
+        string memory finalSvg = string(
+            abi.encodePacked(baseSvg, combinedWord, "</text></svg>")
+        );
 
         // JSONファイルを所定の位置に取得し、base64としてエンコードします。
         string memory json = Base64.encode(
@@ -58,9 +94,9 @@ contract CreateNFT is ERC721URIStorage {
                         _build,
                         '},{"display_type":"boost_percentage","trait_type":"contirbute","value":',
                         _contribute,
-                        '}, {"trait_type":"Project","value":"polygon-hackathon"}], "name": "VizualizeCommitNFT", "description": "vizualize your contribution in a web3 project", "image": "',
+                        '}, {"trait_type":"Project","value":"polygon-hackathon"}], "name": "VizualizeCommitNFT", "description": "vizualize your contribution in a web3 project", "image": "data:image/svg+xml;base64,',
                         // 画像設定
-                        pickRandomImage(newItemId),
+                        Base64.encode(bytes(finalSvg)),
                         '"}'
                     )
                 )
@@ -71,10 +107,10 @@ contract CreateNFT is ERC721URIStorage {
             abi.encodePacked("data:application/json;base64,", json)
         );
 
-        // console.log("\n----- Token URI ----");
+        console.log("\n----- Token URI ----");
         // console.log(test1);
-        // console.log(test2);
-        // console.log("--------------------\n");
+        console.log(finalSvg);
+        console.log("--------------------\n");
 
         _safeMint(_owner, newItemId);
 
