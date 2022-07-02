@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const accessToken = "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";
+const accessToken = "";
 
 export const fetchBranches = async () => {
   const response = await axios({
@@ -30,7 +30,7 @@ export const fetchSpecificCommits = async (sha) => {
   const response = await axios({
     method: "get",
     url:
-      "https://api.github.com/repos/Pana-Mafia/Astar-Hackathon/commits?per_page=50&sha=" +
+      "https://api.github.com/repos/Pana-Mafia/Astar-Hackathon/commits?per_page=100&sha=" +
       sha,
     headers: {
       Accept: "application/vnd.github+json",

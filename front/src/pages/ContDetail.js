@@ -1,7 +1,18 @@
 // 各種インポート
 import { ethers } from "ethers";
 import React, { useEffect, useState, useCallback } from "react";
-import { Card, Box, Button, Chip } from "@mui/material";
+import {
+  Card,
+  Box,
+  Button,
+  Chip,
+  Avatar,
+  CardHeader,
+  CardActions,
+  CardContent,
+  CardMedia,
+  Typography,
+} from "@mui/material";
 
 import "../styles/index.css";
 // import "../styles/index.styl";
@@ -42,7 +53,7 @@ function ContDetail() {
 
     checkIfWalletIsConnected().then(function (value) {
       setCurrentAccount(value);
-    })
+    });
 
     if (window.ethereum) {
       window.ethereum.on("chainChanged", (_chainId) =>
@@ -52,11 +63,57 @@ function ContDetail() {
   }, []);
 
   const branchesAndCommits = branches.map((item, index) => {
+    let newRelatedCommitsArr = relatedCommits[index].filter(
+      (relatedCommitsItem) =>
+        relatedCommitsItem?.commit?.committer?.name !== "GitHub"
+      // &&
+      // relatedCommitsItem?.sha === item?.commit?.sha
+    );
+    let totalYTCommitsArr = [];
+    let totalYUCommitsArr = [];
+    if (item.name === "main" || item.name === "master") {
+      totalYTCommitsArr = newRelatedCommitsArr.filter(
+        (relatedCommitsItem) => relatedCommitsItem?.author?.login === "ystgs"
+      );
+      totalYUCommitsArr = newRelatedCommitsArr.filter(
+        (relatedCommitsItem) => relatedCommitsItem?.author?.login === "gtyuki83"
+      );
+    }
+    const relatedCommitsArr = newRelatedCommitsArr.map(
+      (relatedCommitsArrItem, index) => {
+        console.log(relatedCommitsArrItem);
+        return (
+          <Card key={index} sx={{ my: 1 }}>
+            <CardHeader
+              avatar={
+                <Avatar
+                  sx={{}}
+                  alt="avatar"
+                  src={relatedCommitsArrItem?.committer?.avatar_url}
+                />
+              }
+              title={relatedCommitsArrItem?.author?.login}
+              subheader={relatedCommitsArrItem?.commit?.committer?.date}
+            />
+            <CardContent>
+              <Typography variant="body2" color="text.primary">
+                {relatedCommitsArrItem?.commit?.message}
+              </Typography>
+            </CardContent>
+          </Card>
+        );
+      }
+    );
     return (
       <Box
         key={index}
         className="column"
-        sx={{ width: 500, mx: 2, p: 2, backgroundColor: "rgb(240,240,240)" }}
+        sx={{
+          width: 700,
+          mx: 2,
+          p: 2,
+          backgroundColor: "rgb(240,240,240)",
+        }}
       >
         <Button variant="contained">{item?.name}</Button>
 
@@ -71,12 +128,28 @@ function ContDetail() {
         <Chip sx={{ width: 150, mt: 3.5 }} label="ID" color="primary" />
         <p>{item?.commit?.sha}</p>
 
+        {item.name === "main" || item.name === "master" ? (
+          <div>
+            <Chip
+              sx={{ width: 150, mt: 3.5 }}
+              label="貢献Commit数"
+              color="primary"
+            />
+            <Typography variant="body2" color="text.primary">
+              ystgs: {totalYTCommitsArr?.length}
+            </Typography>
+            <Typography variant="body2" color="text.primary">
+              gtyuki83: {totalYUCommitsArr?.length}
+            </Typography>
+          </div>
+        ) : null}
+
         <Chip
           sx={{ width: 150, mt: 3.5 }}
           label="結びつくコミット"
           color="primary"
         />
-        <p>{JSON.stringify(relatedCommits)}</p>
+        {relatedCommitsArr}
       </Box>
     );
   });
@@ -111,14 +184,13 @@ function ContDetail() {
         className="row"
         style={{
           overflowX: "scroll",
-          overflowY: "scroll",
           height: "100%",
           width: "100%",
         }}
       >
         {branchesAndCommits}
       </div>
-    </div >
+    </div>
   );
 }
 
