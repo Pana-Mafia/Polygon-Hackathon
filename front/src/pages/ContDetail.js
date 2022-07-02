@@ -7,12 +7,25 @@ import "../styles/index.css";
 // import "../styles/index.styl";
 import walletConnect from "../components/WalletConnect";
 import addWallet from "../components/AddWallet";
+import viewMember from "../components/viewMember";
 import checkIfWalletIsConnected from "../components/CheckIfWalletIsConnected";
 import {
   fetchBranches,
   fetchCommits,
   fetchSpecificCommits,
 } from "../api-clients/index";
+
+// Firebase関係
+import { onSnapshot } from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  collection,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
+import { firebaseFirestore } from "../components/Firebase";
 
 function ContDetail() {
   const [currentAccount, setCurrentAccount] = useState("");
@@ -23,6 +36,9 @@ function ContDetail() {
 
   // アドレス
   const [addressValue, setAddressValue] = useState("");
+  // ユーザー一覧
+  const [users, setUsers] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
 
   useEffect(() => {
     const getBranches = async () => {
@@ -42,6 +58,7 @@ function ContDetail() {
 
     checkIfWalletIsConnected().then(function (value) {
       setCurrentAccount(value);
+      viewMember(value);
     })
 
     if (window.ethereum) {
@@ -50,6 +67,27 @@ function ContDetail() {
       );
     }
   }, []);
+
+  useEffect(() => {
+    const usersCollectionRef = collection(firebaseFirestore, "wallet");
+    // リアタイ更新
+    const unsub = onSnapshot(usersCollectionRef, (querySnapshot) => {
+      setUsers(
+        querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+      );
+    });
+    return unsub;
+  }, []);
+
+  const getAllUsers = async () => {
+    const userCleaned = users.map((user) => {
+      return {
+        address: user.address
+      };
+    });
+    setAllUsers(userCleaned);
+  };
+
 
   const branchesAndCommits = branches.map((item, index) => {
     return (
@@ -106,6 +144,7 @@ function ContDetail() {
         >
           タスクを作成する
         </button>
+        <br />
       </Box>
       <div
         className="row"
