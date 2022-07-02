@@ -35,8 +35,8 @@ function ContDetail() {
     }
   }, []);
 
-  const branchItems = branches.map((item, index) => (
-    <div key={index}>
+  const branchesAndCommits = branches.map((item, index) => (
+    <div key={index} className="row">
       <p>{JSON.stringify(item?.name)}</p>
       <p>{JSON.stringify(item)}</p>
       <p>{JSON.stringify(item?.commit?.sha)}</p>
@@ -51,12 +51,11 @@ function ContDetail() {
   ));
 
   return (
-    <div className="App">
-      <button className="waveButton" onClick={walletConnect}>
+    <div className="cont-detail-wrapper">
+      <button className="waveBtn" onClick={walletConnect}>
         Connect Wallet
       </button>
-      <div>{branchItems}</div>
-      <div>{commitsItems}</div>
+      <div>{branchesAndCommits}</div>
     </div>
   );
 }
