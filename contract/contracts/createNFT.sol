@@ -41,16 +41,25 @@ contract CreateNFT is ERC721URIStorage {
         return images[rand];
     }
 
-    function writeNFT() public {
+    function writeNFT(
+        string memory _build,
+        string memory _contribute,
+        address _owner
+    ) public {
         uint256 newItemId = _tokenIds.current();
+        console.log(_build);
 
         // JSONファイルを所定の位置に取得し、base64としてエンコードします。
         string memory json = Base64.encode(
             bytes(
                 string(
                     abi.encodePacked(
-                        '{"attributes":[{"display_type":"boost_percentage","trait_type":"build","value":45},{"display_type":"boost_number","trait_type":"contirbute","value":20}, {"trait_type":"eyes","value":"sleepy"}], "name": "VizualizeCommitNFT", "description": "vizualize your contribution in a web3 project", "image": "',
-                        // NFTのタイトルを生成される言葉（例: GrandCuteBird）に設定します。
+                        '{"attributes":[{"display_type":"boost_percentage","trait_type":"build","value":',
+                        _build,
+                        '},{"display_type":"boost_percentage","trait_type":"contirbute","value":',
+                        _contribute,
+                        '}, {"trait_type":"Project","value":"polygon-hackathon"}], "name": "VizualizeCommitNFT", "description": "vizualize your contribution in a web3 project", "image": "',
+                        // 画像設定
                         pickRandomImage(newItemId),
                         '"}'
                     )
@@ -62,11 +71,12 @@ contract CreateNFT is ERC721URIStorage {
             abi.encodePacked("data:application/json;base64,", json)
         );
 
-        console.log("\n----- Token URI ----");
-        console.log(finalTokenUri);
-        console.log("--------------------\n");
+        // console.log("\n----- Token URI ----");
+        // console.log(test1);
+        // console.log(test2);
+        // console.log("--------------------\n");
 
-        _safeMint(msg.sender, newItemId);
+        _safeMint(_owner, newItemId);
 
         _setTokenURI(newItemId, finalTokenUri);
 
