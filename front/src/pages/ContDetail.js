@@ -15,23 +15,24 @@ import {
 
 function ContDetail() {
   const [currentAccount, setCurrentAccount] = useState("");
-  const [branches, setBranches] = useState([""]);
-  const [commits, setCommits] = useState([""]);
+  const [branches, setBranches] = useState([]);
+  const [commits, setCommits] = useState([]);
+  const [tmpCommits, setTmpCommits] = useState([]);
 
   useEffect(() => {
     const getBranches = async () => {
-      const data = await fetchBranches();
-      setBranches(data.data);
-      return data.data;
-    };
-    const getCommits = async () => {
-      const data = await fetchCommits();
-      setCommits(data.data);
-      return data.data;
+      const tmpData = await fetchBranches();
+      const data = await tmpData.data.map(async (item, index) => {
+        const tmpSpeCommi = fetchSpecificCommits(item?.name);
+        item.relatedCommits = tmpSpeCommi?.data;
+        return item;
+      });
+      console.log(data);
+      setBranches(data);
+      return data;
     };
 
     getBranches();
-    getCommits();
 
     if (window.ethereum) {
       window.ethereum.on("chainChanged", (_chainId) =>
@@ -39,46 +40,46 @@ function ContDetail() {
       );
     }
   }, []);
+  // useEffect(() => {
+  //   let data = branches.map(async (item, index) => {
+  //     const tmpSpeCommi = await fetchSpecificCommits(item?.name);
+  //     item.relatedCommits = tmpSpeCommi?.data;
+  //     console.log(item);
+  //     return item;
+  //   });
+  //   setBranches(data); // and then update the state
+  //   console.log(data);
+  // }, [setBranches]);
 
   const branchesAndCommits = branches.map((item, index) => {
     return (
       <Box
         key={index}
         className="column"
-        sx={{ width: 500, mx: 2, px: 2, backgroundColor: "rgb(240,240,240)" }}
+        sx={{ width: 500, mx: 2, p: 2, backgroundColor: "rgb(240,240,240)" }}
       >
         <Button variant="contained">{item?.name}</Button>
 
-        <Chip sx={{ width: 150, mt: 3.5 }} label="リンク" color="secondary" />
+        <Chip sx={{ width: 150, mt: 3.5 }} label="リンク" color="primary" />
         <a href={item?.commit?.url} target="_blank">
           Full JSON
         </a>
 
-        <Chip
-          sx={{ width: 150, mt: 3.5 }}
-          label="ブランチ名"
-          color="secondary"
-        />
+        <Chip sx={{ width: 150, mt: 3.5 }} label="ブランチ名" color="primary" />
         <p>{item?.name}</p>
 
-        <Chip sx={{ width: 150, mt: 3.5 }} label="ID" color="secondary" />
+        <Chip sx={{ width: 150, mt: 3.5 }} label="ID" color="primary" />
         <p>{item?.commit?.sha}</p>
 
         <Chip
           sx={{ width: 150, mt: 3.5 }}
           label="結びつくコミット"
-          color="secondary"
+          color="primary"
         />
+        <p>{JSON.stringify(item)}</p>
       </Box>
     );
   });
-
-  const commitsItems = commits.map((item, index) => (
-    <div key={index}>
-      <p>{JSON.stringify(item?.sha)}</p>
-      <p>{JSON.stringify(item?.commit?.author)}</p>
-    </div>
-  ));
 
   return (
     <div className="cont-detail-wrapper">
