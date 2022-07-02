@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const accessToken = "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";
+const accessToken = "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";
 
 export const fetchBranches = async () => {
   const response = await axios({
@@ -11,7 +11,6 @@ export const fetchBranches = async () => {
       Authorization: "token " + accessToken,
     },
   });
-  console.log(response);
   return response;
 };
 
@@ -24,19 +23,19 @@ export const fetchCommits = async () => {
       Authorization: "token " + accessToken,
     },
   });
-  console.log(response);
   return response;
 };
 
-export const fetchSpecificCommits = async () => {
+export const fetchSpecificCommits = async (sha) => {
   const response = await axios({
     method: "get",
-    url: "https://api.github.com/repos/Pana-Mafia/Astar-Hackathon/commits",
+    url:
+      "https://api.github.com/repos/Pana-Mafia/Astar-Hackathon/commits?per_page=50&sha=" +
+      sha,
     headers: {
       Accept: "application/vnd.github+json",
       Authorization: "token " + accessToken,
     },
   });
-  console.log(response);
   return response;
 };

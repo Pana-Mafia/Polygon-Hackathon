@@ -6,6 +6,7 @@ import { Card, Box, Button, Chip } from "@mui/material";
 import "../styles/index.css";
 // import "../styles/index.styl";
 import walletConnect from "../components/WalletConnect";
+import addWallet from "../components/AddWallet";
 import checkIfWalletIsConnected from "../components/CheckIfWalletIsConnected";
 import {
   fetchBranches,
@@ -15,23 +16,33 @@ import {
 
 function ContDetail() {
   const [currentAccount, setCurrentAccount] = useState("");
-  const [branches, setBranches] = useState([""]);
-  const [commits, setCommits] = useState([""]);
+  const [branches, setBranches] = useState([]);
+  const [relatedCommits, setRelatedCommits] = useState([]);
+  const [commits, setCommits] = useState([]);
+  const [tmpCommits, setTmpCommits] = useState([]);
+
+  // アドレス
+  const [addressValue, setAddressValue] = useState("");
 
   useEffect(() => {
     const getBranches = async () => {
-      const data = await fetchBranches();
-      setBranches(data.data);
-      return data.data;
-    };
-    const getCommits = async () => {
-      const data = await fetchCommits();
-      setCommits(data.data);
-      return data.data;
+      const branchesData = await fetchBranches();
+      const relatedCommitsData = await Promise.all(
+        branchesData.data.map(async (item, index) => {
+          const tmpSpeCommi = await fetchSpecificCommits(item?.name);
+          return tmpSpeCommi.data;
+        })
+      );
+      setBranches(branchesData.data);
+      setRelatedCommits(relatedCommitsData);
+      return null;
     };
 
     getBranches();
-    getCommits();
+
+    checkIfWalletIsConnected().then(function (value) {
+      setCurrentAccount(value);
+    })
 
     if (window.ethereum) {
       window.ethereum.on("chainChanged", (_chainId) =>
@@ -45,46 +56,55 @@ function ContDetail() {
       <Box
         key={index}
         className="column"
-        sx={{ width: 500, mx: 2, px: 2, backgroundColor: "rgb(240,240,240)" }}
+        sx={{ width: 500, mx: 2, p: 2, backgroundColor: "rgb(240,240,240)" }}
       >
         <Button variant="contained">{item?.name}</Button>
 
-        <Chip sx={{ width: 150, mt: 3.5 }} label="リンク" color="secondary" />
+        <Chip sx={{ width: 150, mt: 3.5 }} label="リンク" color="primary" />
         <a href={item?.commit?.url} target="_blank">
           Full JSON
         </a>
 
-        <Chip
-          sx={{ width: 150, mt: 3.5 }}
-          label="ブランチ名"
-          color="secondary"
-        />
+        <Chip sx={{ width: 150, mt: 3.5 }} label="ブランチ名" color="primary" />
         <p>{item?.name}</p>
 
-        <Chip sx={{ width: 150, mt: 3.5 }} label="ID" color="secondary" />
+        <Chip sx={{ width: 150, mt: 3.5 }} label="ID" color="primary" />
         <p>{item?.commit?.sha}</p>
 
         <Chip
           sx={{ width: 150, mt: 3.5 }}
           label="結びつくコミット"
-          color="secondary"
+          color="primary"
         />
+        <p>{JSON.stringify(relatedCommits)}</p>
       </Box>
     );
   });
-
-  const commitsItems = commits.map((item, index) => (
-    <div key={index}>
-      <p>{JSON.stringify(item?.sha)}</p>
-      <p>{JSON.stringify(item?.commit?.author)}</p>
-    </div>
-  ));
 
   return (
     <div className="cont-detail-wrapper">
       <Box sx={{ p: 2 }}>
         <button className="waveBtn" onClick={walletConnect}>
           Connect Wallet
+        </button>
+        <br />
+        <textarea
+          name="messageArea"
+          className="form"
+          placeholder="成果物のリンクを添付"
+          type="text"
+          id="riward"
+          value={addressValue}
+          onChange={(e) => setAddressValue(e.target.value)}
+        />
+        <br />
+        <button
+          className="submitButton"
+          onClick={() => {
+            addWallet(currentAccount);
+          }}
+        >
+          タスクを作成する
         </button>
       </Box>
       <div
@@ -98,7 +118,7 @@ function ContDetail() {
       >
         {branchesAndCommits}
       </div>
-    </div>
+    </div >
   );
 }
 

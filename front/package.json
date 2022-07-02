@@ -11,7 +11,7 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^0.27.2",
     "ethers": "^5.4.7",
-    "firebase": "^9.0.0-beta.2",
+    "firebase": "^9.8.4",
     "firebase-admin": "^10.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
