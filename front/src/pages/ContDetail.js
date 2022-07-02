@@ -1,12 +1,17 @@
 // 各種インポート
 import { ethers } from "ethers";
 import React, { useEffect, useState, useCallback } from "react";
+import { Card, Box, Button, Chip } from "@mui/material";
 
 import "../styles/index.css";
-import "../styles/index.styl";
+// import "../styles/index.styl";
 import walletConnect from "../components/WalletConnect";
 import checkIfWalletIsConnected from "../components/CheckIfWalletIsConnected";
-import { fetchBranches, fetchCommits } from "../api-clients/index";
+import {
+  fetchBranches,
+  fetchCommits,
+  fetchSpecificCommits,
+} from "../api-clients/index";
 
 function ContDetail() {
   const [currentAccount, setCurrentAccount] = useState("");
@@ -35,13 +40,38 @@ function ContDetail() {
     }
   }, []);
 
-  const branchesAndCommits = branches.map((item, index) => (
-    <div key={index} className="row">
-      <p>{JSON.stringify(item?.name)}</p>
-      <p>{JSON.stringify(item)}</p>
-      <p>{JSON.stringify(item?.commit?.sha)}</p>
-    </div>
-  ));
+  const branchesAndCommits = branches.map((item, index) => {
+    return (
+      <Box
+        key={index}
+        className="column"
+        sx={{ width: 500, mx: 2, px: 2, backgroundColor: "rgb(240,240,240)" }}
+      >
+        <Button variant="contained">{item?.name}</Button>
+
+        <Chip sx={{ width: 150, mt: 3.5 }} label="リンク" color="secondary" />
+        <a href={item?.commit?.url} target="_blank">
+          Full JSON
+        </a>
+
+        <Chip
+          sx={{ width: 150, mt: 3.5 }}
+          label="ブランチ名"
+          color="secondary"
+        />
+        <p>{item?.name}</p>
+
+        <Chip sx={{ width: 150, mt: 3.5 }} label="ID" color="secondary" />
+        <p>{item?.commit?.sha}</p>
+
+        <Chip
+          sx={{ width: 150, mt: 3.5 }}
+          label="結びつくコミット"
+          color="secondary"
+        />
+      </Box>
+    );
+  });
 
   const commitsItems = commits.map((item, index) => (
     <div key={index}>
@@ -52,10 +82,22 @@ function ContDetail() {
 
   return (
     <div className="cont-detail-wrapper">
-      <button className="waveBtn" onClick={walletConnect}>
-        Connect Wallet
-      </button>
-      <div>{branchesAndCommits}</div>
+      <Box sx={{ p: 2 }}>
+        <button className="waveBtn" onClick={walletConnect}>
+          Connect Wallet
+        </button>
+      </Box>
+      <div
+        className="row"
+        style={{
+          overflowX: "scroll",
+          overflowY: "scroll",
+          height: "100%",
+          width: "100%",
+        }}
+      >
+        {branchesAndCommits}
+      </div>
     </div>
   );
 }
