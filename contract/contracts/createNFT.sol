@@ -87,4 +87,15 @@ contract CreateNFT is ERC721URIStorage {
         );
         _tokenIds.increment();
     }
+
+    // 譲渡不可
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal pure override {
+        // mintは許可（そのまま処理を通す）
+        // transferは禁止（処理を中断させる）
+        require(from == address(0));
+    }
 }
