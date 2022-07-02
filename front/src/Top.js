@@ -9,19 +9,19 @@ import { fetchBranches, fetchCommits } from "./api-clients/index";
 
 function Top() {
   const [currentAccount, setCurrentAccount] = useState("");
-  const [commits, setCommits] = useState(null);
-  const [branches, setBranches] = useState(null);
+  const [commits, setCommits] = useState([]);
+  const [branches, setBranches] = useState([]);
 
   useEffect(() => {
     const getBranches = async () => {
       const data = await fetchBranches();
-      setBranches(data);
-      return data;
+      setBranches(data.data);
+      return data.data;
     };
     const getCommits = async () => {
       const data = await fetchCommits();
-      setCommits(data);
-      return data;
+      setCommits(data.data);
+      return data.data;
     };
 
     getBranches();
