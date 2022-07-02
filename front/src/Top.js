@@ -9,8 +9,8 @@ import { fetchBranches, fetchCommits } from "./api-clients/index";
 
 function Top() {
   const [currentAccount, setCurrentAccount] = useState("");
-  const [commits, setCommits] = useState([]);
-  const [branches, setBranches] = useState([]);
+  const [branches, setBranches] = useState([""]);
+  const [commits, setCommits] = useState([""]);
 
   useEffect(() => {
     const getBranches = async () => {
@@ -53,8 +53,8 @@ function Top() {
           Connect Wallet
         </button>
       </header>
-      {/* <p>{commits}</p>
-      <p>{branches}</p> */}
+      <div>{commits}</div>
+      <div>{branches}</div>
     </div>
   );
 }
