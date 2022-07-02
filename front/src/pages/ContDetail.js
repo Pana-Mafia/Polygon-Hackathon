@@ -2,8 +2,8 @@
 import { ethers } from "ethers";
 import React, { useEffect, useState, useCallback } from "react";
 
-import logo from "../assets/logo.svg";
-import "../styles/App.css";
+import "../styles/index.css";
+import "../styles/index.styl";
 import walletConnect from "../components/WalletConnect";
 import checkIfWalletIsConnected from "../components/CheckIfWalletIsConnected";
 import { fetchBranches, fetchCommits } from "../api-clients/index";
