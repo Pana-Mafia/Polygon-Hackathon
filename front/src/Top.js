@@ -9,19 +9,19 @@ import { fetchBranches, fetchCommits } from "./api-clients/index";
 
 function Top() {
   const [currentAccount, setCurrentAccount] = useState("");
-  const [commits, setCommits] = useState(null);
-  const [branches, setBranches] = useState(null);
+  const [branches, setBranches] = useState([""]);
+  const [commits, setCommits] = useState([""]);
 
   useEffect(() => {
     const getBranches = async () => {
       const data = await fetchBranches();
-      setBranches(data);
-      return data;
+      setBranches(data.data);
+      return data.data;
     };
     const getCommits = async () => {
       const data = await fetchCommits();
-      setCommits(data);
-      return data;
+      setCommits(data.data);
+      return data.data;
     };
 
     getBranches();
@@ -33,6 +33,17 @@ function Top() {
       );
     }
   }, []);
+
+  const branchItems = branches.map((item, index) => (
+    <p key={index}>{JSON.stringify(item?.commit?.sha)}</p>
+  ));
+
+  const commitsItems = commits.map((item, index) => (
+    <div key={index}>
+      <p>{JSON.stringify(item?.sha)}</p>
+      <p>{JSON.stringify(item?.commit?.author)}</p>
+    </div>
+  ));
 
   return (
     <div className="App">
@@ -53,8 +64,8 @@ function Top() {
           Connect Wallet
         </button>
       </header>
-      {/* <p>{commits}</p>
-      <p>{branches}</p> */}
+      <div>{branchItems}</div>
+      <div>{commitsItems}</div>
     </div>
   );
 }
