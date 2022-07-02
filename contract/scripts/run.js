@@ -5,7 +5,7 @@ const main = async () => {
     await nftContract.deployed();
     console.log("Contract deployed to:", nftContract.address);
     // writeNFT 関数を呼び出す。NFT が Mint される。
-    let txn = await nftContract.writeNFT("20", "60");
+    let txn = await nftContract.writeNFT("20", "60", "0x3a0bE810754f7f7D04fCA10E2C11E93ebb5BF19e");
     // Minting が仮想マイナーにより、承認されるのを待つ。
     await txn.wait();
     // writeNFT 関数をもう一度呼び出す。NFT がまた Mint される。
