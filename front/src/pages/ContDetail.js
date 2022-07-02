@@ -1,13 +1,14 @@
 // 各種インポート
 import { ethers } from "ethers";
 import React, { useEffect, useState, useCallback } from "react";
-import logo from "./logo.svg";
-import "./App.css";
-import walletConnect from "./components/WalletConnect";
-import checkIfWalletIsConnected from "./components/CheckIfWalletIsConnected";
-import { fetchBranches, fetchCommits } from "./api-clients/index";
 
-function Top() {
+import logo from "../assets/logo.svg";
+import "../styles/App.css";
+import walletConnect from "../components/WalletConnect";
+import checkIfWalletIsConnected from "../components/CheckIfWalletIsConnected";
+import { fetchBranches, fetchCommits } from "../api-clients/index";
+
+function ContDetail() {
   const [currentAccount, setCurrentAccount] = useState("");
   const [branches, setBranches] = useState([""]);
   const [commits, setCommits] = useState([""]);
@@ -35,7 +36,11 @@ function Top() {
   }, []);
 
   const branchItems = branches.map((item, index) => (
-    <p key={index}>{JSON.stringify(item?.commit?.sha)}</p>
+    <div key={index}>
+      <p>{JSON.stringify(item?.name)}</p>
+      <p>{JSON.stringify(item)}</p>
+      <p>{JSON.stringify(item?.commit?.sha)}</p>
+    </div>
   ));
 
   const commitsItems = commits.map((item, index) => (
@@ -47,27 +52,13 @@ function Top() {
 
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <button className="waveButton" onClick={walletConnect}>
-          Connect Wallet
-        </button>
-      </header>
+      <button className="waveButton" onClick={walletConnect}>
+        Connect Wallet
+      </button>
       <div>{branchItems}</div>
       <div>{commitsItems}</div>
     </div>
   );
 }
 
-export default Top;
+export default ContDetail;
