@@ -30,7 +30,7 @@ export const fetchSpecificCommits = async (sha) => {
   const response = await axios({
     method: "get",
     url:
-      "https://api.github.com/repos/Pana-Mafia/Astar-Hackathon/commits?per_page=100&sha=" +
+      "https://api.github.com/repos/Pana-Mafia/Astar-Hackathon/commits?per_page=50&sha=" +
       sha,
     headers: {
       Accept: "application/vnd.github+json",

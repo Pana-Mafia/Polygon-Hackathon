@@ -16,20 +16,22 @@ import {
 function ContDetail() {
   const [currentAccount, setCurrentAccount] = useState("");
   const [branches, setBranches] = useState([]);
+  const [relatedCommits, setRelatedCommits] = useState([]);
   const [commits, setCommits] = useState([]);
   const [tmpCommits, setTmpCommits] = useState([]);
 
   useEffect(() => {
     const getBranches = async () => {
-      const tmpData = await fetchBranches();
-      const data = await tmpData.data.map(async (item, index) => {
-        const tmpSpeCommi = fetchSpecificCommits(item?.name);
-        item.relatedCommits = tmpSpeCommi?.data;
-        return item;
-      });
-      console.log(data);
-      setBranches(data);
-      return data;
+      const branchesData = await fetchBranches();
+      const relatedCommitsData = await Promise.all(
+        branchesData.data.map(async (item, index) => {
+          const tmpSpeCommi = await fetchSpecificCommits(item?.name);
+          return tmpSpeCommi.data;
+        })
+      );
+      setBranches(branchesData.data);
+      setRelatedCommits(relatedCommitsData);
+      return null;
     };
 
     getBranches();
@@ -40,16 +42,6 @@ function ContDetail() {
       );
     }
   }, []);
-  // useEffect(() => {
-  //   let data = branches.map(async (item, index) => {
-  //     const tmpSpeCommi = await fetchSpecificCommits(item?.name);
-  //     item.relatedCommits = tmpSpeCommi?.data;
-  //     console.log(item);
-  //     return item;
-  //   });
-  //   setBranches(data); // and then update the state
-  //   console.log(data);
-  // }, [setBranches]);
 
   const branchesAndCommits = branches.map((item, index) => {
     return (
@@ -76,7 +68,7 @@ function ContDetail() {
           label="結びつくコミット"
           color="primary"
         />
-        <p>{JSON.stringify(item)}</p>
+        <p>{JSON.stringify(relatedCommits)}</p>
       </Box>
     );
   });
