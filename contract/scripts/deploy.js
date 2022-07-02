@@ -12,12 +12,7 @@ const main = async () => {
     let txn = await nftContract.writeNFT();
     // Minting が仮想マイナーにより、承認されるのを待ちます。
     await txn.wait();
-    console.log("Minted NFT #1");
-    // writeNFT 関数をもう一度呼び出します。NFT がまた Mint されます。
-    txn = await nftContract.writeNFT();
-    // Minting が仮想マイナーにより、承認されるのを待ちます。
-    await txn.wait();
-    console.log("Minted NFT #2");
+    console.log("Minted NFT");
 };
 // エラー処理を行っています。
 const runMain = async () => {

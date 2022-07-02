@@ -19,7 +19,8 @@ contract CreateNFT is ERC721URIStorage {
     // 画像をランダムに選ぶための配列
     string[] images = [
         "https://icooon-mono.com/i/icon_14482/icon_144820_256.png",
-        "https://imgur.com/a/EDiTvUG"
+        "https://1.bp.blogspot.com/-n4Zy5znzzkQ/U9y_ul94R8I/AAAAAAAAjh4/sDzmU7G0UMA/s800/kippu.png",
+        "https://free-icons.net/wp-content/uploads/2021/03/leisure02.png"
     ];
 
     // シードを生成する関数を作成します。
@@ -48,7 +49,7 @@ contract CreateNFT is ERC721URIStorage {
             bytes(
                 string(
                     abi.encodePacked(
-                        '{"name": "VizualizeCommitNFT", "description": "vizualize your contribution in a web3 project", "image": "',
+                        '{"attributes":[{"display_type":"boost_percentage","trait_type":"build","value":45},{"display_type":"boost_number","trait_type":"contirbute","value":20}, {"trait_type":"eyes","value":"sleepy"}], "name": "VizualizeCommitNFT", "description": "vizualize your contribution in a web3 project", "image": "',
                         // NFTのタイトルを生成される言葉（例: GrandCuteBird）に設定します。
                         pickRandomImage(newItemId),
                         '"}'
