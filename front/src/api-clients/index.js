@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const accessToken = "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";
+const accessToken = "";
 
 export const fetchBranches = async () => {
   const response = await axios({

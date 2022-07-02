@@ -34,6 +34,17 @@ function Top() {
     }
   }, []);
 
+  const branchItems = branches.map((item, index) => (
+    <p key={index}>{JSON.stringify(item?.commit?.sha)}</p>
+  ));
+
+  const commitsItems = commits.map((item, index) => (
+    <div key={index}>
+      <p>{JSON.stringify(item?.sha)}</p>
+      <p>{JSON.stringify(item?.commit?.author)}</p>
+    </div>
+  ));
+
   return (
     <div className="App">
       <header className="App-header">
@@ -53,8 +64,8 @@ function Top() {
           Connect Wallet
         </button>
       </header>
-      <div>{commits}</div>
-      <div>{branches}</div>
+      <div>{branchItems}</div>
+      <div>{commitsItems}</div>
     </div>
   );
 }
