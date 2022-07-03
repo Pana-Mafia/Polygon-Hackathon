@@ -375,7 +375,7 @@ function ContDetail() {
               </Button>
 
               <TextField
-                sx={{ mt: 3.5 }}
+                sx={{ mt: 3.5, backgroundColor: "white" }}
                 id="outlined-basic"
                 label="thanks comment"
                 variant="outlined"
