@@ -375,11 +375,12 @@ function ContDetail() {
               </Button>
 
               <TextField
+                sx={{ mt: 3.5 }}
                 id="outlined-basic"
-                label="Outlined"
+                label="thanks comment"
                 variant="outlined"
               />
-              <Button variant="outlined">Outlined</Button>
+              <Button variant="outlined">送信</Button>
 
               <Chip
                 sx={{ width: 150, mt: 3.5 }}
