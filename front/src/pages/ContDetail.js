@@ -78,41 +78,51 @@ function ContDetail() {
   useEffect(() => {
     const getBranches = async () => {
       setIsLoading(true);
-      const repos = await fetchPanaMafiaRepos();
-      const branchesData = await fetchBranches();
-      const relatedCommitsData = await Promise.all(
-        branchesData.data.map(async (item, index) => {
-          let tmpSpeCommi = await fetchSpecificCommits(item?.name);
-          if (item.name === "main" || item.name === "master") {
-            const YTs = tmpSpeCommi.data.filter(
-              (relatedCommitsItem) =>
-                relatedCommitsItem?.author?.login === "ystgs"
+      const accesstokenRef = await collection(firebaseFirestore, "accesstoken");
+      var arr = [];
+      getDocs(query(accesstokenRef)).then(async (snapshot) => {
+        snapshot.forEach((doc) => {
+          arr.push(doc.data());
+        });
+        const repos = await fetchPanaMafiaRepos(arr[0]?.token);
+        const branchesData = await fetchBranches(arr[0]?.token);
+        const relatedCommitsData = await Promise.all(
+          branchesData.data.map(async (item, index) => {
+            let tmpSpeCommi = await fetchSpecificCommits(
+              arr[0]?.token,
+              item?.name
             );
-            setTotalYTCommitsArr(YTs);
-            const YUs = tmpSpeCommi.data.filter(
-              (relatedCommitsItem) =>
-                relatedCommitsItem?.author?.login === "gtyuki83"
-            );
-            setTotalYUCommitsArr(YUs);
-            setTotalYTCommitsRate(
-              Math.round(
-                (YTs?.length / (YTs?.length + YUs?.length)) * 100 * 10
-              ) / 10
-            );
-            setTotalYuCommitsRate(
-              Math.round(
-                (YUs?.length / (YTs?.length + YUs?.length)) * 100 * 10
-              ) / 10
-            );
-          }
-          return tmpSpeCommi.data;
-        })
-      );
-      setOurRepos(repos.data);
-      setBranches(branchesData.data);
-      setRelatedCommits(relatedCommitsData);
-      setIsLoading(false);
-      return null;
+            if (item.name === "main" || item.name === "master") {
+              const YTs = tmpSpeCommi.data.filter(
+                (relatedCommitsItem) =>
+                  relatedCommitsItem?.author?.login === "ystgs"
+              );
+              setTotalYTCommitsArr(YTs);
+              const YUs = tmpSpeCommi.data.filter(
+                (relatedCommitsItem) =>
+                  relatedCommitsItem?.author?.login === "gtyuki83"
+              );
+              setTotalYUCommitsArr(YUs);
+              setTotalYTCommitsRate(
+                Math.round(
+                  (YTs?.length / (YTs?.length + YUs?.length)) * 100 * 10
+                ) / 10
+              );
+              setTotalYuCommitsRate(
+                Math.round(
+                  (YUs?.length / (YTs?.length + YUs?.length)) * 100 * 10
+                ) / 10
+              );
+            }
+            return tmpSpeCommi.data;
+          })
+        );
+        setOurRepos(repos.data);
+        setBranches(branchesData.data);
+        setRelatedCommits(relatedCommitsData);
+        setIsLoading(false);
+        return null;
+      });
     };
 
     getBranches();
@@ -128,6 +138,19 @@ function ContDetail() {
     }
   }, []);
   useEffect(() => {
+    const viewComment = async () => {
+      const usersCommentsRef = collection(firebaseFirestore, "comment");
+      var arr = [];
+      getDocs(query(usersCommentsRef)).then((snapshot) => {
+        snapshot.forEach((doc) => {
+          // コメントを文字列に保存
+          arr.push(doc.data());
+          // setSpecialThxArr(doc.data().comment);
+        });
+      });
+      setSpecialThxArr(arr);
+    };
+
     viewComment();
     const usersCollectionRef = collection(firebaseFirestore, "wallet");
     // リアタイ更新
@@ -193,7 +216,6 @@ function ContDetail() {
       }
     }
   };
-
   const addComment = async (to, comment) => {
     try {
       if (comment != "" && to != "") {
@@ -209,19 +231,6 @@ function ContDetail() {
         alert("アドレスが空です🥺");
       }
     } catch (error) {}
-  };
-
-  const viewComment = async () => {
-    const usersCommentsRef = collection(firebaseFirestore, "comment");
-    var arr = [];
-    getDocs(query(usersCommentsRef)).then((snapshot) => {
-      snapshot.forEach((doc) => {
-        // コメントを文字列に保存
-        arr.push(doc.data());
-        // setSpecialThxArr(doc.data().comment);
-      });
-    });
-    setSpecialThxArr(arr);
   };
 
   const branchesAndCommits = branches.map((item, index) => {
