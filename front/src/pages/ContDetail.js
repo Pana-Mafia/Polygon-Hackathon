@@ -59,7 +59,7 @@ function ContDetail() {
   const [allUsers, setAllUsers] = useState([]);
 
   // コントラクトとの通信用
-  const contractAddress = "0xC838ACc05a7Bc08054995b4e51DD92481cf86550"
+  const contractAddress = "0x079bbe2aFe400F30A138a774F6FA297591A198eD"
   // ABIの参照
   const ContractABI = abi.abi;
 
