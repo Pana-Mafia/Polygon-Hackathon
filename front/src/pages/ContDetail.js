@@ -12,8 +12,14 @@ import {
   CardContent,
   CardMedia,
   Typography,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Stack,
+  LinearProgress,
+  TextField,
 } from "@mui/material";
-
 import "../styles/index.css";
 // import "../styles/index.styl";
 import walletConnect from "../components/WalletConnect";
@@ -24,8 +30,8 @@ import {
   fetchBranches,
   fetchCommits,
   fetchSpecificCommits,
+  fetchPanaMafiaRepos,
 } from "../api-clients/index";
-
 // Firebase関係
 import { onSnapshot } from "firebase/firestore";
 import {
@@ -37,7 +43,6 @@ import {
   where,
 } from "firebase/firestore";
 import { firebaseFirestore } from "../components/Firebase";
-
 import abi from "../utils/CreateNFT.json";
 
 function ContDetail() {
@@ -48,22 +53,87 @@ function ContDetail() {
   const [tmpCommits, setTmpCommits] = useState([]);
   const [yuCommits, setYuCommits] = useState([]);
   const [ytCommits, setYtCommits] = useState([]);
-
+  const [ourRepos, setOurRepos] = useState([]);
+  const [currentRepo, setCurrentRepo] = useState("");
   const [totalYTCommitsArr, setTotalYTCommitsArr] = useState([]);
   const [totalYTCommitsRate, setTotalYTCommitsRate] = useState(null);
   const [totalYUCommitsArr, setTotalYUCommitsArr] = useState([]);
-  const [totalYUCommitsRate, setTotalYuCommitsRate] = useState(null);
-
+  const [totalYuCommitsRate, setTotalYuCommitsRate] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [specialThxArr, setSpecialThxArr] = useState([]);
   // アドレス
   const [addressValue, setAddressValue] = useState("");
   // ユーザー一覧
   const [users, setUsers] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
-
   // コントラクトとの通信用
   const contractAddress = "0x9d2123928514566BD2e0cfa9C541e4ac20298dFe"
   // ABIの参照
   const ContractABI = abi.abi;
+
+  useEffect(() => {
+    const getBranches = async () => {
+      setIsLoading(true);
+      const repos = await fetchPanaMafiaRepos();
+      const branchesData = await fetchBranches();
+      const relatedCommitsData = await Promise.all(
+        branchesData.data.map(async (item, index) => {
+          let tmpSpeCommi = await fetchSpecificCommits(item?.name);
+          if (item.name === "main" || item.name === "master") {
+            const YTs = tmpSpeCommi.data.filter(
+              (relatedCommitsItem) =>
+                relatedCommitsItem?.author?.login === "ystgs"
+            );
+            setTotalYTCommitsArr(YTs);
+            const YUs = tmpSpeCommi.data.filter(
+              (relatedCommitsItem) =>
+                relatedCommitsItem?.author?.login === "gtyuki83"
+            );
+            setTotalYUCommitsArr(YUs);
+            setTotalYTCommitsRate(
+              Math.round(
+                (YTs?.length / (YTs?.length + YUs?.length)) * 100 * 10
+              ) / 10
+            );
+            setTotalYuCommitsRate(
+              Math.round(
+                (YUs?.length / (YTs?.length + YUs?.length)) * 100 * 10
+              ) / 10
+            );
+          }
+          return tmpSpeCommi.data;
+        })
+      );
+      setOurRepos(repos.data);
+      setBranches(branchesData.data);
+      setRelatedCommits(relatedCommitsData);
+      setIsLoading(false);
+      return null;
+    };
+
+    getBranches();
+
+    checkIfWalletIsConnected().then(function (value) {
+      setCurrentAccount(value);
+    });
+
+    if (window.ethereum) {
+      window.ethereum.on("chainChanged", (_chainId) =>
+        window.location.reload()
+      );
+    }
+  }, []);
+  useEffect(() => { }, [specialThxArr]);
+  useEffect(() => {
+    const usersCollectionRef = collection(firebaseFirestore, "wallet");
+    // リアタイ更新
+    const unsub = onSnapshot(usersCollectionRef, (querySnapshot) => {
+      setUsers(
+        querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+      );
+    });
+    return unsub;
+  }, []);
 
   const createNFT = async (a, b, c, d) => {
     try {
@@ -119,67 +189,6 @@ function ContDetail() {
       }
     }
   };
-
-  useEffect(() => {
-    const getBranches = async () => {
-      const branchesData = await fetchBranches();
-      const relatedCommitsData = await Promise.all(
-        branchesData.data.map(async (item, index) => {
-          let tmpSpeCommi = await fetchSpecificCommits(item?.name);
-          if (item.name === "main" || item.name === "master") {
-            const YTs = tmpSpeCommi.data.filter(
-              (relatedCommitsItem) =>
-                relatedCommitsItem?.author?.login === "ystgs"
-            );
-            setTotalYTCommitsArr(YTs);
-            const YUs = tmpSpeCommi.data.filter(
-              (relatedCommitsItem) =>
-                relatedCommitsItem?.author?.login === "gtyuki83"
-            );
-            setTotalYUCommitsArr(YUs);
-            setTotalYTCommitsRate(
-              Math.round(
-                (YTs?.length / (YTs?.length + YUs?.length)) * 100 * 10
-              ) / 10
-            );
-            setTotalYuCommitsRate(
-              Math.round(
-                (YUs?.length / (YTs?.length + YUs?.length)) * 100 * 10
-              ) / 10
-            );
-          }
-          return tmpSpeCommi.data;
-        })
-      );
-      setBranches(branchesData.data);
-      setRelatedCommits(relatedCommitsData);
-      return null;
-    };
-
-    getBranches();
-
-    checkIfWalletIsConnected().then(function (value) {
-      setCurrentAccount(value);
-    });
-
-    if (window.ethereum) {
-      window.ethereum.on("chainChanged", (_chainId) =>
-        window.location.reload()
-      );
-    }
-  }, []);
-
-  useEffect(() => {
-    const usersCollectionRef = collection(firebaseFirestore, "wallet");
-    // リアタイ更新
-    const unsub = onSnapshot(usersCollectionRef, (querySnapshot) => {
-      setUsers(
-        querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
-      );
-    });
-    return unsub;
-  }, []);
-
   const getAllUsers = async () => {
     const userCleaned = users.map((user) => {
       return {
@@ -275,12 +284,28 @@ function ContDetail() {
 
   return (
     <div className="cont-detail-wrapper">
-      <Box sx={{ p: 2 }}>
-        <button className="waveBtn" onClick={walletConnect}>
-          Connect Wallet
-        </button>
-        <br />
-        {/* <textarea
+      {isLoading ? (
+        <div
+          className="row justifyCenter alignCenter"
+          style={{ height: "100vh" }}
+        >
+          <Stack sx={{ width: "50%", color: "grey.500" }} spacing={4}>
+            <LinearProgress color="secondary" />
+            <LinearProgress color="secondary" />
+            <LinearProgress color="secondary" />
+          </Stack>
+        </div>
+      ) : (
+        <div>
+          <Box className="row" sx={{ p: 2 }}>
+            <button
+              className="waveBtn"
+              style={{ marginRight: 16 }}
+              onClick={walletConnect}
+            >
+              Connect Wallet
+            </button>
+            {/* <textarea
           name="messageArea"
           className="form"
           placeholder="成果物のリンクを添付"
@@ -298,27 +323,93 @@ function ContDetail() {
         >
           タスクを作成する
         </button> */}
+            <button
+              className="submitButton"
+              style={{ marginRight: 16 }}
+              onClick={() => {
+                createNFT(yuCommits, 50, ytCommits, 50);
+              }}
+            >
+              NFTを発行する
+            </button>
+            <FormControl sx={{}} size="small">
+              <InputLabel id="demo-select-small">Repository</InputLabel>
+              <Select
+                labelId="demo-select-small"
+                id="demo-select-small"
+                value={currentRepo}
+                label="Repository"
+                onChange={(val) => setCurrentRepo}
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                <MenuItem value={10}>Ten</MenuItem>
+                <MenuItem value={20}>Twenty</MenuItem>
+                <MenuItem value={30}>Thirty</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+          <div
+            className="row"
+            style={{
+              overflowX: "scroll",
+              height: "100%",
+              width: "100%",
+            }}
+          >
+            <Box
+              className="column"
+              sx={{
+                mx: 2,
+                p: 2,
+                backgroundColor: "rgb(240,240,240)",
+              }}
+            >
+              <Button
+                style={{ width: "400px" }}
+                disableRipple
+                variant="contained"
+              >
+                Special thanks
+              </Button>
 
-        <button
-          className="submitButton"
-          onClick={() => {
-            createNFT(totalYTCommitsRate.toString(), "50", totalYUCommitsRate.toString(), "50");
-          }}
-        >
-          NFTを発行する
-        </button>
-        <br />
-      </Box>
-      <div
-        className="row"
-        style={{
-          overflowX: "scroll",
-          height: "100%",
-          width: "100%",
-        }}
-      >
-        {branchesAndCommits}
-      </div>
+              <TextField
+                id="outlined-basic"
+                label="Outlined"
+                variant="outlined"
+              />
+              <Button variant="outlined">Outlined</Button>
+
+              <Chip
+                sx={{ width: 150, mt: 3.5 }}
+                label="サマリー"
+                color="primary"
+              />
+
+              <Chip sx={{ width: 150, mt: 3.5 }} label="一覧" color="primary" />
+              {specialThxArr.map((item, index) => {
+                return (
+                  <Card key={index} sx={{ my: 1 }}>
+                    <CardHeader
+                      avatar={
+                        <Avatar sx={{}} alt="avatar" src={item?.avatar_url} />
+                      }
+                      title={item?.username}
+                    />
+                    <CardContent>
+                      <Typography variant="body2" color="text.primary">
+                        {item?.message}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </Box>
+            {branchesAndCommits}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
