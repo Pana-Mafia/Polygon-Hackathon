@@ -58,18 +58,22 @@ function ContDetail() {
   const [totalYTCommitsArr, setTotalYTCommitsArr] = useState([]);
   const [totalYTCommitsRate, setTotalYTCommitsRate] = useState(null);
   const [totalYUCommitsArr, setTotalYUCommitsArr] = useState([]);
-  const [totalYuCommitsRate, setTotalYuCommitsRate] = useState(null);
+  const [totalYUCommitsRate, setTotalYuCommitsRate] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [specialThxArr, setSpecialThxArr] = useState([]);
   // アドレス
   const [addressValue, setAddressValue] = useState("");
   // ユーザー一覧
   const [users, setUsers] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
   // コントラクトとの通信用
-  const contractAddress = "0xC838ACc05a7Bc08054995b4e51DD92481cf86550";
+  const contractAddress = "0x9d2123928514566BD2e0cfa9C541e4ac20298dFe"
   // ABIの参照
   const ContractABI = abi.abi;
+
+  // コメント登録時状態変数
+  const [commentValue, setCommentValue] = useState("");
+  // コメント表示
+  const [specialThxArr, setSpecialThxArr] = useState([]);
 
   useEffect(() => {
     const getBranches = async () => {
@@ -123,8 +127,9 @@ function ContDetail() {
       );
     }
   }, []);
-  useEffect(() => {}, [specialThxArr]);
+  useEffect(() => { }, [specialThxArr]);
   useEffect(() => {
+    viewComment();
     const usersCollectionRef = collection(firebaseFirestore, "wallet");
     // リアタイ更新
     const unsub = onSnapshot(usersCollectionRef, (querySnapshot) => {
@@ -189,14 +194,42 @@ function ContDetail() {
       }
     }
   };
-  const getAllUsers = async () => {
-    const userCleaned = users.map((user) => {
-      return {
-        address: user.address,
-      };
+
+  const addComment = async (comment) => {
+    try {
+      if (comment != "") {
+        console.log(comment)
+        const commentsRef = collection(firebaseFirestore, "comment");
+        const newDoc = doc(commentsRef).id;
+        console.log(newDoc);
+        const documentRef = await setDoc(doc(commentsRef, newDoc), {
+          comment: comment,
+          id: newDoc,
+        });
+      } else {
+        alert("アドレスが空です🥺")
+      }
+    } catch (error) {
+
+    }
+  }
+
+  const viewComment = async () => {
+    const usersCommentsRef = collection(firebaseFirestore, "comment");
+    var arr = [];
+    getDocs(
+      query(usersCommentsRef)
+    ).then((snapshot) => {
+      snapshot.forEach((doc) => {
+        console.log(doc.data().comment);
+        // コメントを文字列に保存
+        arr.push(doc.data().comment)
+        // setSpecialThxArr(doc.data().comment);
+      });
     });
-    setAllUsers(userCleaned);
-  };
+    setSpecialThxArr(arr);
+    console.log(specialThxArr)
+  }
 
   const branchesAndCommits = branches.map((item, index) => {
     let newRelatedCommitsArr = relatedCommits[index].filter(
@@ -267,7 +300,7 @@ function ContDetail() {
               ystgs: {totalYTCommitsArr?.length} ({totalYTCommitsRate}%)
             </Typography>
             <Typography variant="body2" color="text.primary">
-              gtyuki83: {totalYUCommitsArr?.length} ({totalYuCommitsRate}%)
+              gtyuki83: {totalYUCommitsArr?.length} ({totalYUCommitsRate}%)
             </Typography>
           </div>
         ) : null}
@@ -361,8 +394,15 @@ function ContDetail() {
                 id="outlined-basic"
                 label="thanks comment"
                 variant="outlined"
+                value={commentValue}
+                onChange={(e) => setCommentValue(e.target.value)}
               />
-              <Button variant="outlined">送信</Button>
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  addComment(commentValue);
+                  setCommentValue("");
+                }}>送信</Button>
 
               <Chip
                 sx={{ width: 150, mt: 3.5 }}
@@ -382,7 +422,7 @@ function ContDetail() {
                     />
                     <CardContent>
                       <Typography variant="body2" color="text.primary">
-                        {item?.message}
+                        {item}
                       </Typography>
                     </CardContent>
                   </Card>
