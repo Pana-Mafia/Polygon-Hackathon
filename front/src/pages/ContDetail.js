@@ -66,11 +66,11 @@ function ContDetail() {
   const [users, setUsers] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
   // コントラクトとの通信用
-  const contractAddress = "0x9d2123928514566BD2e0cfa9C541e4ac20298dFe"
+  const contractAddress = "0x9d2123928514566BD2e0cfa9C541e4ac20298dFe";
   // ABIの参照
   const ContractABI = abi.abi;
-
   // コメント登録時状態変数
+  const [commentToValue, setCommentToValue] = useState("");
   const [commentValue, setCommentValue] = useState("");
   // コメント表示
   const [specialThxArr, setSpecialThxArr] = useState([]);
@@ -127,7 +127,6 @@ function ContDetail() {
       );
     }
   }, []);
-  useEffect(() => { }, [specialThxArr]);
   useEffect(() => {
     viewComment();
     const usersCollectionRef = collection(firebaseFirestore, "wallet");
@@ -195,41 +194,35 @@ function ContDetail() {
     }
   };
 
-  const addComment = async (comment) => {
+  const addComment = async (to, comment) => {
     try {
-      if (comment != "") {
-        console.log(comment)
+      if (comment != "" && to != "") {
         const commentsRef = collection(firebaseFirestore, "comment");
         const newDoc = doc(commentsRef).id;
         console.log(newDoc);
         const documentRef = await setDoc(doc(commentsRef, newDoc), {
+          to: to,
           comment: comment,
           id: newDoc,
         });
       } else {
-        alert("アドレスが空です🥺")
+        alert("アドレスが空です🥺");
       }
-    } catch (error) {
-
-    }
-  }
+    } catch (error) {}
+  };
 
   const viewComment = async () => {
     const usersCommentsRef = collection(firebaseFirestore, "comment");
     var arr = [];
-    getDocs(
-      query(usersCommentsRef)
-    ).then((snapshot) => {
+    getDocs(query(usersCommentsRef)).then((snapshot) => {
       snapshot.forEach((doc) => {
-        console.log(doc.data().comment);
         // コメントを文字列に保存
-        arr.push(doc.data().comment)
+        arr.push(doc.data());
         // setSpecialThxArr(doc.data().comment);
       });
     });
     setSpecialThxArr(arr);
-    console.log(specialThxArr)
-  }
+  };
 
   const branchesAndCommits = branches.map((item, index) => {
     let newRelatedCommitsArr = relatedCommits[index].filter(
@@ -355,13 +348,9 @@ function ContDetail() {
                 value={currentRepo}
                 label="Repository"
                 onChange={(val) => setCurrentRepo}
+                style={{ width: 160 }}
               >
-                <MenuItem value="">
-                  <em>None</em>
-                </MenuItem>
                 <MenuItem value={10}>Ten</MenuItem>
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>Thirty</MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -389,8 +378,24 @@ function ContDetail() {
                 Special thanks
               </Button>
 
-              <TextField
+              <FormControl
                 sx={{ mt: 3.5, backgroundColor: "white" }}
+                size="small"
+              >
+                <InputLabel id="select-to">To</InputLabel>
+                <Select
+                  labelId="select-to"
+                  id="select-to-select"
+                  value={commentToValue}
+                  label="To"
+                  onChange={(e) => setCommentToValue(e.target.value)}
+                >
+                  <MenuItem value={"ystgs"}>ystgs</MenuItem>
+                  <MenuItem value={"gtyuki83"}>gtyuki83</MenuItem>
+                </Select>
+              </FormControl>
+              <TextField
+                sx={{ mt: 0.5, backgroundColor: "white" }}
                 id="outlined-basic"
                 label="thanks comment"
                 variant="outlined"
@@ -398,31 +403,58 @@ function ContDetail() {
                 onChange={(e) => setCommentValue(e.target.value)}
               />
               <Button
+                sx={{ mt: 0.5 }}
                 variant="outlined"
                 onClick={() => {
-                  addComment(commentValue);
+                  specialThxArr.push({
+                    to: commentToValue,
+                    comment: commentValue,
+                  });
+                  addComment(commentToValue, commentValue);
+                  setCommentToValue("");
                   setCommentValue("");
-                }}>送信</Button>
+                }}
+              >
+                送信
+              </Button>
+
+              <Chip
+                sx={{ width: 150, mt: 3.5 }}
+                label="Contributors"
+                color="primary"
+              />
+              <Typography variant="body2" color="text.primary">
+                gtyuki83
+              </Typography>
+              <Typography variant="body2" color="text.primary">
+                ystgs
+              </Typography>
 
               <Chip
                 sx={{ width: 150, mt: 3.5 }}
                 label="サマリー"
                 color="primary"
               />
+              <Typography variant="body2" color="text.primary">
+                ystgs: {totalYTCommitsArr?.length} ({totalYTCommitsRate}%)
+              </Typography>
+              <Typography variant="body2" color="text.primary">
+                gtyuki83: {totalYUCommitsArr?.length} ({totalYUCommitsRate}%)
+              </Typography>
 
               <Chip sx={{ width: 150, mt: 3.5 }} label="一覧" color="primary" />
               {specialThxArr.map((item, index) => {
                 return (
                   <Card key={index} sx={{ my: 1 }}>
                     <CardHeader
-                      avatar={
-                        <Avatar sx={{}} alt="avatar" src={item?.avatar_url} />
-                      }
-                      title={item?.username}
+                      // avatar={
+                      //   <Avatar sx={{}} alt="avatar" src={item?.avatar_url} />
+                      // }
+                      title={"To: " + item?.to}
                     />
                     <CardContent>
                       <Typography variant="body2" color="text.primary">
-                        {item}
+                        {item.comment}
                       </Typography>
                     </CardContent>
                   </Card>
