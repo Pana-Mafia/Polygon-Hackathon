@@ -290,9 +290,9 @@ function ContDetail() {
           style={{ height: "100vh" }}
         >
           <Stack sx={{ width: "50%", color: "grey.500" }} spacing={4}>
-            <LinearProgress color="secondary" />
-            <LinearProgress color="secondary" />
-            <LinearProgress color="secondary" />
+            <LinearProgress color="primary" />
+            <LinearProgress color="primary" />
+            <LinearProgress color="primary" />
           </Stack>
         </div>
       ) : (
