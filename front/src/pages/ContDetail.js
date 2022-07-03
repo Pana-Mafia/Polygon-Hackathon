@@ -305,24 +305,6 @@ function ContDetail() {
             >
               Connect Wallet
             </button>
-            {/* <textarea
-          name="messageArea"
-          className="form"
-          placeholder="成果物のリンクを添付"
-          type="text"
-          id="riward"
-          value={addressValue}
-          onChange={(e) => setAddressValue(e.target.value)}
-        />
-        <br />
-        <button
-          className="submitButton"
-          onClick={() => {
-            addWallet(currentAccount);
-          }}
-        >
-          タスクを作成する
-        </button> */}
             <button
               className="submitButton"
               style={{ marginRight: 16 }}
