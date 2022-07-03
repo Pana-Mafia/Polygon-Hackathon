@@ -445,10 +445,10 @@ function ContDetail() {
                 color="primary"
               />
               <Typography variant="body2" color="text.primary">
-                ystgs: {totalYTCommitsArr?.length} ({totalYTCommitsRate}%)
+                to ystgs: {totalYTCommitsArr?.length} ({totalYTCommitsRate}%)
               </Typography>
               <Typography variant="body2" color="text.primary">
-                gtyuki83: {totalYUCommitsArr?.length} ({totalYUCommitsRate}%)
+                to gtyuki83: {totalYUCommitsArr?.length} ({totalYUCommitsRate}%)
               </Typography>
 
               <Chip sx={{ width: 150, mt: 3.5 }} label="一覧" color="primary" />
