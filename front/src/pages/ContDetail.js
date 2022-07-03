@@ -115,7 +115,9 @@ function ContDetail() {
           backgroundColor: "rgb(240,240,240)",
         }}
       >
-        <Button variant="contained">{item?.name}</Button>
+        <Button disableRipple variant="contained">
+          {item?.name}
+        </Button>
 
         <Chip sx={{ width: 150, mt: 3.5 }} label="リンク" color="primary" />
         <a href={item?.commit?.url} target="_blank">
