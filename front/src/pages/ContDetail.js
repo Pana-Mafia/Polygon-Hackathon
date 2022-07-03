@@ -72,6 +72,10 @@ function ContDetail() {
   // コメント登録時状態変数
   const [commentToValue, setCommentToValue] = useState("");
   const [commentValue, setCommentValue] = useState("");
+  const [commentYTArr, setCommentYTArr] = useState([]);
+  const [commentYTRate, setCommentYTRate] = useState(null);
+  const [commentYUArr, setCommentYUArr] = useState([]);
+  const [commentYURate, setCommentYURate] = useState(null);
   // コメント表示
   const [specialThxArr, setSpecialThxArr] = useState([]);
 
@@ -148,6 +152,17 @@ function ContDetail() {
           // setSpecialThxArr(doc.data().comment);
         });
       });
+      console.log(arr);
+      const YTs = arr.filter((item) => item?.to === "ystgs");
+      setCommentYTArr(YTs);
+      const YUs = arr.filter((item) => item?.to === "gtyuki83");
+      setCommentYUArr(YUs);
+      setCommentYTRate(
+        Math.round((YTs?.length / (YTs?.length + YUs?.length)) * 100 * 10) / 10
+      );
+      setCommentYURate(
+        Math.round((YUs?.length / (YTs?.length + YUs?.length)) * 100 * 10) / 10
+      );
       setSpecialThxArr(arr);
     };
 
@@ -448,10 +463,10 @@ function ContDetail() {
                 color="primary"
               />
               <Typography variant="body2" color="text.primary">
-                to ystgs: {totalYTCommitsArr?.length} ({totalYTCommitsRate}%)
+                to ystgs: {commentYTArr?.length} ({commentYTRate}%)
               </Typography>
               <Typography variant="body2" color="text.primary">
-                to gtyuki83: {totalYUCommitsArr?.length} ({totalYUCommitsRate}%)
+                to gtyuki83: {commentYUArr?.length} ({commentYURate}%)
               </Typography>
 
               <Chip sx={{ width: 150, mt: 3.5 }} label="list" color="primary" />
