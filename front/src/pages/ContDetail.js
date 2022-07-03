@@ -50,7 +50,9 @@ function ContDetail() {
   const [ytCommits, setYtCommits] = useState([]);
 
   const [totalYTCommitsArr, setTotalYTCommitsArr] = useState([]);
+  const [totalYTCommitsRate, setTotalYTCommitsRate] = useState(null);
   const [totalYUCommitsArr, setTotalYUCommitsArr] = useState([]);
+  const [totalYUCommitsRate, setTotalYuCommitsRate] = useState(null);
 
   // アドレス
   const [addressValue, setAddressValue] = useState("");
@@ -59,7 +61,7 @@ function ContDetail() {
   const [allUsers, setAllUsers] = useState([]);
 
   // コントラクトとの通信用
-  const contractAddress = "0x079bbe2aFe400F30A138a774F6FA297591A198eD"
+  const contractAddress = "0x9d2123928514566BD2e0cfa9C541e4ac20298dFe"
   // ABIの参照
   const ContractABI = abi.abi;
 
@@ -123,14 +125,27 @@ function ContDetail() {
       const branchesData = await fetchBranches();
       const relatedCommitsData = await Promise.all(
         branchesData.data.map(async (item, index) => {
-          const tmpSpeCommi = await fetchSpecificCommits(item?.name);
+          let tmpSpeCommi = await fetchSpecificCommits(item?.name);
           if (item.name === "main" || item.name === "master") {
-            console.log(item)
-            totalYTCommitsArr = tmpSpeCommi.data[index].filter(
-              (relatedCommitsItem) => relatedCommitsItem?.author?.login === "ystgs"
+            const YTs = tmpSpeCommi.data.filter(
+              (relatedCommitsItem) =>
+                relatedCommitsItem?.author?.login === "ystgs"
             );
-            totalYUCommitsArr = tmpSpeCommi.data[index].filter(
-              (relatedCommitsItem) => relatedCommitsItem?.author?.login === "gtyuki83"
+            setTotalYTCommitsArr(YTs);
+            const YUs = tmpSpeCommi.data.filter(
+              (relatedCommitsItem) =>
+                relatedCommitsItem?.author?.login === "gtyuki83"
+            );
+            setTotalYUCommitsArr(YUs);
+            setTotalYTCommitsRate(
+              Math.round(
+                (YTs?.length / (YTs?.length + YUs?.length)) * 100 * 10
+              ) / 10
+            );
+            setTotalYuCommitsRate(
+              Math.round(
+                (YUs?.length / (YTs?.length + YUs?.length)) * 100 * 10
+              ) / 10
             );
           }
           return tmpSpeCommi.data;
@@ -168,12 +183,11 @@ function ContDetail() {
   const getAllUsers = async () => {
     const userCleaned = users.map((user) => {
       return {
-        address: user.address
+        address: user.address,
       };
     });
     setAllUsers(userCleaned);
   };
-
 
   const branchesAndCommits = branches.map((item, index) => {
     let newRelatedCommitsArr = relatedCommits[index].filter(
@@ -182,23 +196,9 @@ function ContDetail() {
       // &&
       // relatedCommitsItem?.sha === item?.commit?.sha
     );
-    // let totalYTCommitsArr = [];
-    // let totalYUCommitsArr = [];
-    // if (item.name === "main" || item.name === "master") {
-    //   totalYTCommitsArr = newRelatedCommitsArr.filter(
-    //     (relatedCommitsItem) => relatedCommitsItem?.author?.login === "ystgs"
-    //   );
-    //   totalYUCommitsArr = newRelatedCommitsArr.filter(
-    //     (relatedCommitsItem) => relatedCommitsItem?.author?.login === "gtyuki83"
-    //   );
-    // }
-    // それぞれのcommitにおけるパーセンテージを算出
-    // setYtCommits(Math.round(totalYTCommitsArr?.length / (totalYTCommitsArr?.length + totalYUCommitsArr?.length) * 100 * 10) / 10);
-    // setYuCommits(Math.round(totalYUCommitsArr?.length / (totalYTCommitsArr?.length + totalYUCommitsArr?.length) * 100 * 10) / 10);
 
     const relatedCommitsArr = newRelatedCommitsArr.map(
       (relatedCommitsArrItem, index) => {
-        console.log(relatedCommitsArrItem);
         return (
           <Card key={index} sx={{ my: 1 }}>
             <CardHeader
@@ -232,7 +232,9 @@ function ContDetail() {
           backgroundColor: "rgb(240,240,240)",
         }}
       >
-        <Button variant="contained">{item?.name}</Button>
+        <Button disableRipple variant="contained">
+          {item?.name}
+        </Button>
 
         <Chip sx={{ width: 150, mt: 3.5 }} label="リンク" color="primary" />
         <a href={item?.commit?.url} target="_blank">
@@ -253,10 +255,10 @@ function ContDetail() {
               color="primary"
             />
             <Typography variant="body2" color="text.primary">
-              ystgs: {totalYTCommitsArr?.length}({Math.round(totalYTCommitsArr?.length / (totalYTCommitsArr?.length + totalYUCommitsArr?.length) * 100 * 10) / 10}%)
+              ystgs: {totalYTCommitsArr?.length} ({totalYTCommitsRate}%)
             </Typography>
             <Typography variant="body2" color="text.primary">
-              gtyuki83: {totalYUCommitsArr?.length}({Math.round(totalYUCommitsArr?.length / (totalYTCommitsArr?.length + totalYUCommitsArr?.length) * 100 * 10) / 10}%)
+              gtyuki83: {totalYUCommitsArr?.length} ({totalYUCommitsRate}%)
             </Typography>
           </div>
         ) : null}
@@ -300,12 +302,7 @@ function ContDetail() {
         <button
           className="submitButton"
           onClick={() => {
-            createNFT(
-              yuCommits,
-              50,
-              ytCommits,
-              50,
-            );
+            createNFT(totalYTCommitsRate.toString(), "50", totalYUCommitsRate.toString(), "50");
           }}
         >
           NFTを発行する

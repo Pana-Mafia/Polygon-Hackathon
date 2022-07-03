@@ -69,13 +69,11 @@ contract CreateNFT is ERC721URIStorage {
         // 文字列
         string memory combinedWord = string(
             abi.encodePacked(
-                "In this project, You",
-                // toAsciiString(_owner),
-                " builded ",
+                "In #PolygonTokyoHack, You builded ",
                 _build,
                 "% and contributed ",
                 _contribute,
-                "% Totally"
+                "% Totally."
             )
             // abi.encodePacked("testing our NFT service")
         );
