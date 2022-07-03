@@ -22,6 +22,14 @@ code {
   flex-direction: row;
 }
 
+.justifyCenter {
+  justify-content: center;
+}
+
+.alignCenter {
+  align-items: center;
+}
+
 .column {
   display: flex;
   flex-direction: column;

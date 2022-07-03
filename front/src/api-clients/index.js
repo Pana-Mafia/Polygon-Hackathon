@@ -39,3 +39,15 @@ export const fetchSpecificCommits = async (sha) => {
   });
   return response;
 };
+
+export const fetchPanaMafiaRepos = async () => {
+  const response = await axios({
+    method: "get",
+    url: "https://api.github.com/orgs/Pana-Mafia/repos",
+    headers: {
+      Accept: "application/vnd.github+json",
+      Authorization: "token " + accessToken,
+    },
+  });
+  return response;
+};

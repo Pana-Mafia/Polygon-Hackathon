@@ -12,6 +12,12 @@ import {
   CardContent,
   CardMedia,
   Typography,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Stack,
+  LinearProgress,
 } from "@mui/material";
 
 import "../styles/index.css";
@@ -24,6 +30,7 @@ import {
   fetchBranches,
   fetchCommits,
   fetchSpecificCommits,
+  fetchPanaMafiaRepos,
 } from "../api-clients/index";
 
 // Firebase関係
@@ -48,11 +55,13 @@ function ContDetail() {
   const [tmpCommits, setTmpCommits] = useState([]);
   const [yuCommits, setYuCommits] = useState([]);
   const [ytCommits, setYtCommits] = useState([]);
-
+  const [ourRepos, setOurRepos] = useState([]);
+  const [currentRepo, setCurrentRepo] = useState("");
   const [totalYTCommitsArr, setTotalYTCommitsArr] = useState([]);
   const [totalYTCommitsRate, setTotalYTCommitsRate] = useState(null);
   const [totalYUCommitsArr, setTotalYUCommitsArr] = useState([]);
   const [totalYuCommitsRate, setTotalYuCommitsRate] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // アドレス
   const [addressValue, setAddressValue] = useState("");
@@ -122,6 +131,8 @@ function ContDetail() {
 
   useEffect(() => {
     const getBranches = async () => {
+      setIsLoading(true);
+      const repos = await fetchPanaMafiaRepos();
       const branchesData = await fetchBranches();
       const relatedCommitsData = await Promise.all(
         branchesData.data.map(async (item, index) => {
@@ -151,8 +162,10 @@ function ContDetail() {
           return tmpSpeCommi.data;
         })
       );
+      setOurRepos(repos.data);
       setBranches(branchesData.data);
       setRelatedCommits(relatedCommitsData);
+      setIsLoading(false);
       return null;
     };
 
@@ -275,12 +288,28 @@ function ContDetail() {
 
   return (
     <div className="cont-detail-wrapper">
-      <Box sx={{ p: 2 }}>
-        <button className="waveBtn" onClick={walletConnect}>
-          Connect Wallet
-        </button>
-        <br />
-        {/* <textarea
+      {isLoading ? (
+        <div
+          className="row justifyCenter alignCenter"
+          style={{ height: "100vh" }}
+        >
+          <Stack sx={{ width: "50%", color: "grey.500" }} spacing={4}>
+            <LinearProgress color="secondary" />
+            <LinearProgress color="secondary" />
+            <LinearProgress color="secondary" />
+          </Stack>
+        </div>
+      ) : (
+        <div>
+          <Box className="row" sx={{ p: 2 }}>
+            <button
+              className="waveBtn"
+              style={{ marginRight: 16 }}
+              onClick={walletConnect}
+            >
+              Connect Wallet
+            </button>
+            {/* <textarea
           name="messageArea"
           className="form"
           placeholder="成果物のリンクを添付"
@@ -298,27 +327,45 @@ function ContDetail() {
         >
           タスクを作成する
         </button> */}
-
-        <button
-          className="submitButton"
-          onClick={() => {
-            createNFT(yuCommits, 50, ytCommits, 50);
-          }}
-        >
-          NFTを発行する
-        </button>
-        <br />
-      </Box>
-      <div
-        className="row"
-        style={{
-          overflowX: "scroll",
-          height: "100%",
-          width: "100%",
-        }}
-      >
-        {branchesAndCommits}
-      </div>
+            <button
+              className="submitButton"
+              style={{ marginRight: 16 }}
+              onClick={() => {
+                createNFT(yuCommits, 50, ytCommits, 50);
+              }}
+            >
+              NFTを発行する
+            </button>
+            <FormControl sx={{}} size="small">
+              <InputLabel id="demo-select-small">Repository</InputLabel>
+              <Select
+                labelId="demo-select-small"
+                id="demo-select-small"
+                value={currentRepo}
+                label="Repository"
+                onChange={(val) => setCurrentRepo}
+              >
+                <MenuItem value="">
+                  <em>None</em>
+                </MenuItem>
+                <MenuItem value={10}>Ten</MenuItem>
+                <MenuItem value={20}>Twenty</MenuItem>
+                <MenuItem value={30}>Thirty</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+          <div
+            className="row"
+            style={{
+              overflowX: "scroll",
+              height: "100%",
+              width: "100%",
+            }}
+          >
+            {branchesAndCommits}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
