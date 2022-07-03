@@ -199,7 +199,6 @@ function ContDetail() {
 
     const relatedCommitsArr = newRelatedCommitsArr.map(
       (relatedCommitsArrItem, index) => {
-        console.log(relatedCommitsArrItem);
         return (
           <Card key={index} sx={{ my: 1 }}>
             <CardHeader
@@ -256,24 +255,10 @@ function ContDetail() {
               color="primary"
             />
             <Typography variant="body2" color="text.primary">
-              ystgs: {totalYTCommitsArr?.length} (
-              {Math.round(
-                (totalYTCommitsArr?.length /
-                  (totalYTCommitsArr?.length + totalYUCommitsArr?.length)) *
-                  100 *
-                  10
-              ) / 10}
-              %)
+              ystgs: {totalYTCommitsArr?.length} ({totalYTCommitsRate}%)
             </Typography>
             <Typography variant="body2" color="text.primary">
-              gtyuki83: {totalYUCommitsArr?.length} (
-              {Math.round(
-                (totalYUCommitsArr?.length /
-                  (totalYTCommitsArr?.length + totalYUCommitsArr?.length)) *
-                  100 *
-                  10
-              ) / 10}
-              %)
+              gtyuki83: {totalYUCommitsArr?.length} ({totalYuCommitsRate}%)
             </Typography>
           </div>
         ) : null}
