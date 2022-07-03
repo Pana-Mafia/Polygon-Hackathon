@@ -221,7 +221,6 @@ function ContDetail() {
       if (comment != "" && to != "") {
         const commentsRef = collection(firebaseFirestore, "comment");
         const newDoc = doc(commentsRef).id;
-        console.log(newDoc);
         const documentRef = await setDoc(doc(commentsRef, newDoc), {
           to: to,
           comment: comment,
