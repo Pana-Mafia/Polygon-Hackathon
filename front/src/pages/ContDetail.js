@@ -342,7 +342,7 @@ function ContDetail() {
               className="submitButton"
               style={{ marginRight: 16 }}
               onClick={() => {
-                createNFT(yuCommits, 50, ytCommits, 50);
+                createNFT(totalYUCommitsRate.toString(), "50", totalYTCommitsRate, "50");
               }}
             >
               NFTを発行する
