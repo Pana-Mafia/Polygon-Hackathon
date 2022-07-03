@@ -28,3 +28,5 @@ Challenges faced：
 ・It is so hard to import github to visualize menber's commitment.
 ・When building NFT minting feature, I don't know how to write text and add properties. 
 　But UNCHAIN lesson is so helpful! I love UNCHAIN lesson and it's community! :)
+・We made NFT "Non-Transferrable" in order to prove that the owner is the truly contributor.
+・Building time is so short that we made a lot of effort to complete hacking in 24 hours. 🥺
