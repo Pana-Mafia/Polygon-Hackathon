@@ -279,12 +279,16 @@ function ContDetail() {
           {item?.name}
         </Button>
 
-        <Chip sx={{ width: 150, mt: 3.5 }} label="リンク" color="primary" />
+        <Chip sx={{ width: 150, mt: 3.5 }} label="link" color="primary" />
         <a href={item?.commit?.url} target="_blank">
           Full JSON
         </a>
 
-        <Chip sx={{ width: 150, mt: 3.5 }} label="ブランチ名" color="primary" />
+        <Chip
+          sx={{ width: 150, mt: 3.5 }}
+          label="branch name"
+          color="primary"
+        />
         <p>{item?.name}</p>
 
         <Chip sx={{ width: 150, mt: 3.5 }} label="ID" color="primary" />
@@ -293,8 +297,8 @@ function ContDetail() {
         {item.name === "main" || item.name === "master" ? (
           <div>
             <Chip
-              sx={{ width: 150, mt: 3.5 }}
-              label="貢献Commit数"
+              sx={{ width: 200, mt: 3.5 }}
+              label="contributed commit number"
               color="primary"
             />
             <Typography variant="body2" color="text.primary">
@@ -308,7 +312,7 @@ function ContDetail() {
 
         <Chip
           sx={{ width: 150, mt: 3.5 }}
-          label="結びつくコミット"
+          label="included commits"
           color="primary"
         />
         {relatedCommitsArr}
@@ -346,7 +350,7 @@ function ContDetail() {
                 createNFT(yuCommits, 50, ytCommits, 50);
               }}
             >
-              NFTを発行する
+              Mint NFT
             </button>
             <FormControl sx={{}} size="small">
               <InputLabel id="demo-select-small">Repository</InputLabel>
@@ -423,7 +427,7 @@ function ContDetail() {
                   setCommentValue("");
                 }}
               >
-                送信
+                Send
               </Button>
 
               <Chip
@@ -440,7 +444,7 @@ function ContDetail() {
 
               <Chip
                 sx={{ width: 150, mt: 3.5 }}
-                label="サマリー"
+                label="summary"
                 color="primary"
               />
               <Typography variant="body2" color="text.primary">
@@ -450,7 +454,7 @@ function ContDetail() {
                 to gtyuki83: {totalYUCommitsArr?.length} ({totalYUCommitsRate}%)
               </Typography>
 
-              <Chip sx={{ width: 150, mt: 3.5 }} label="一覧" color="primary" />
+              <Chip sx={{ width: 150, mt: 3.5 }} label="list" color="primary" />
               {specialThxArr.map((item, index) => {
                 return (
                   <Card key={index} sx={{ my: 1 }}>
