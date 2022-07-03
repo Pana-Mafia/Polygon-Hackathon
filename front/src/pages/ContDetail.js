@@ -208,7 +208,7 @@ function ContDetail() {
       } else {
         alert("アドレスが空です🥺");
       }
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const viewComment = async () => {
@@ -335,7 +335,7 @@ function ContDetail() {
               className="submitButton"
               style={{ marginRight: 16 }}
               onClick={() => {
-                createNFT(totalYUCommitsRate.toString(), "50", totalYTCommitsRate, "50");
+                createNFT(totalYUCommitsRate.toString(), "70", totalYTCommitsRate.toString(), "30");
               }}
             >
               NFTを発行する
